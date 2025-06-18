@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 
-const AsyncStorageDevTool: React.FC = () => {
+const AsyncStorageDevTools: React.FC = () => {
   const [visible, setVisible] = useState(false);
   const [storage, setStorage] = useState<{ key: string; value: string }[]>([]);
   const [editingKey, setEditingKey] = useState<string | null>(null);
@@ -294,4 +294,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AsyncStorageDevTool;
+export default AsyncStorageDevTools;

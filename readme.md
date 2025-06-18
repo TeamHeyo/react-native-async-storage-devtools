@@ -2,8 +2,6 @@
 
 A lightweight dev tool UI for React Native that allows you to view, edit, and delete items from `AsyncStorage` during development.
 
-![Demo Video](https://cdn.heyo.is/react-native-async-storage-devtools/demo.mp4)
-
 ## ✨ Features
 
 - 📦 Read all current AsyncStorage keys and values
