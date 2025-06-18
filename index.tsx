@@ -66,87 +66,115 @@ const AsyncStorageDevTools: React.FC = () => {
       <TouchableOpacity
         style={styles.fab}
         onPress={() => setVisible(true)}
-        activeOpacity={0.7}
+        activeOpacity={0.8}
       >
-        <Text style={styles.fabText}>⚡️</Text>
+        <Text style={styles.fabText}>🔧</Text>
       </TouchableOpacity>
-      <Modal visible={visible} animationType="fade" transparent>
+      <Modal visible={visible} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.panel}>
-            <View style={styles.stickyTitleContainer}>
-              <Text style={styles.title}>AsyncStorage DevTools ⚡️</Text>
+            <View style={styles.header}>
+              <View style={styles.titleContainer}>
+                <Text style={styles.title}>AsyncStorage DevTools</Text>
+                <Text style={styles.subtitle}>Development Tools</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setVisible(false)}
+                style={styles.closeIcon}
+              >
+                <Text style={styles.closeIconText}>✕</Text>
+              </TouchableOpacity>
             </View>
-            <ScrollView style={{ maxHeight: 400 }}>
-              {storage.map(({ key, value }: { key: string; value: string }) => (
-                <View key={key} style={styles.item}>
-                  <Text style={styles.key}>{key}</Text>
-                  <Text style={styles.value} numberOfLines={1}>
-                    {value}
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => handleEdit(key, value)}
-                    style={styles.actionBtn}
-                  >
-                    <Text style={{ color: '#2563eb', fontWeight: 'bold' }}>
-                      Edit
+
+            <View style={styles.content}>
+              <View style={styles.statsContainer}>
+                <Text style={styles.statsText}>
+                  {storage.length} {storage.length === 1 ? 'item' : 'items'}
+                </Text>
+              </View>
+
+              <ScrollView
+                style={styles.scrollView}
+                showsVerticalScrollIndicator={false}
+              >
+                {storage.length === 0 ? (
+                  <View style={styles.emptyState}>
+                    <Text style={styles.emptyStateText}>
+                      No data in AsyncStorage
                     </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => handleDelete(key)}
-                    style={styles.deleteBtn}
-                  >
-                    <Text style={{ color: '#fff', fontWeight: 'bold' }}>
-                      Delete
+                    <Text style={styles.emptyStateSubtext}>
+                      Add some data to see it here
                     </Text>
-                  </TouchableOpacity>
-                </View>
-              ))}
-            </ScrollView>
-            <TouchableOpacity onPress={loadStorage} style={styles.reloadBtn}>
-              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Reload</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setVisible(false)}
-              style={styles.closeBtn}
-            >
-              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Close</Text>
-            </TouchableOpacity>
+                  </View>
+                ) : (
+                  storage.map(
+                    ({ key, value }: { key: string; value: string }) => (
+                      <View key={key} style={styles.item}>
+                        <View style={styles.itemContent}>
+                          <Text style={styles.key} numberOfLines={1}>
+                            {key}
+                          </Text>
+                          <Text style={styles.value} numberOfLines={2}>
+                            {value}
+                          </Text>
+                        </View>
+                        <View style={styles.itemActions}>
+                          <TouchableOpacity
+                            onPress={() => handleEdit(key, value)}
+                            style={styles.editBtn}
+                          >
+                            <Text style={styles.editBtnText}>Edit</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity
+                            onPress={() => handleDelete(key)}
+                            style={styles.deleteBtn}
+                          >
+                            <Text style={styles.deleteBtnText}>Delete</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )
+                  )
+                )}
+              </ScrollView>
+            </View>
+
+            <View style={styles.footer}>
+              <TouchableOpacity onPress={loadStorage} style={styles.reloadBtn}>
+                <Text style={styles.reloadBtnText}>🔄 Refresh</Text>
+              </TouchableOpacity>
+            </View>
           </View>
+
           <Modal visible={editingKey !== null} transparent animationType="fade">
             <View style={styles.editOverlay}>
               <View style={styles.editPanel}>
-                <Text style={styles.editTitle}>
-                  Edit Value for {editingKey}
-                </Text>
-                <ScrollView
-                  style={{ maxHeight: 400 }}
-                  contentContainerStyle={{ flexGrow: 1 }}
-                >
+                <View style={styles.editHeader}>
+                  <Text style={styles.editTitle}>Edit Storage Item</Text>
+                  <Text style={styles.editSubtitle}>{editingKey}</Text>
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Value</Text>
                   <TextInput
                     style={styles.input}
                     value={editingValue}
                     onChangeText={setEditingValue}
                     multiline
+                    placeholder="Enter value..."
+                    placeholderTextColor="#9CA3AF"
                   />
-                </ScrollView>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <TouchableOpacity onPress={handleSave} style={styles.saveBtn}>
-                    <Text style={{ color: '#fff', fontWeight: 'bold' }}>
-                      Save
-                    </Text>
-                  </TouchableOpacity>
+                </View>
+
+                <View style={styles.editActions}>
                   <TouchableOpacity
                     onPress={() => setEditingKey(null)}
                     style={styles.cancelBtn}
                   >
-                    <Text style={{ color: '#fff', fontWeight: 'bold' }}>
-                      Cancel
-                    </Text>
+                    <Text style={styles.cancelBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={handleSave} style={styles.saveBtn}>
+                    <Text style={styles.saveBtnText}>Save Changes</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -161,10 +189,10 @@ const AsyncStorageDevTools: React.FC = () => {
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    bottom: 100,
-    right: 20,
-    backgroundColor: '#2563eb',
-    borderRadius: 30,
+    bottom: 120,
+    right: 24,
+    backgroundColor: '#1F2937',
+    borderRadius: 28,
     width: 56,
     height: 56,
     alignItems: 'center',
@@ -173,124 +201,263 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 8,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 4.65,
-    elevation: 8,
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 12,
   },
   fabText: {
     color: '#fff',
-    fontSize: 28,
-    textShadowColor: 'rgba(0, 0, 0, 0.2)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
+    fontSize: 24,
+    fontWeight: '600',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'flex-end',
   },
   panel: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    minHeight: 300,
-    elevation: 10,
-    paddingBottom: 32,
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    minHeight: 400,
+    maxHeight: '80%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: -4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 16,
   },
-  title: {
-    fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  stickyTitleContainer: {
-    backgroundColor: '#fff',
-    paddingBottom: 8,
-    paddingTop: 4,
-    zIndex: 2,
-    elevation: 2,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-  },
-  item: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingBottom: 4,
+    borderBottomColor: '#F3F4F6',
   },
-  key: { flex: 2, fontWeight: 'bold', fontSize: 12 },
-  value: { flex: 3, fontSize: 12, color: '#555' },
-  actionBtn: {
-    marginLeft: 8,
-    padding: 8,
-    backgroundColor: '#e0f0ff',
-    borderRadius: 4,
+  titleContainer: {
+    flex: 1,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    letterSpacing: -0.5,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  closeIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  closeIconText: {
+    fontSize: 16,
+    color: '#6B7280',
+    fontWeight: '600',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  statsContainer: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+    marginBottom: 16,
+  },
+  statsText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#9CA3AF',
+    fontWeight: '500',
+    marginBottom: 4,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    color: '#D1D5DB',
+  },
+  item: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#F3F4F6',
+  },
+  itemContent: {
+    marginBottom: 12,
+  },
+  key: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  value: {
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+  },
+  itemActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  editBtn: {
+    backgroundColor: '#DBEAFE',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  editBtnText: {
+    color: '#1D4ED8',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  deleteBtn: {
+    backgroundColor: '#FEE2E2',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  deleteBtnText: {
+    color: '#DC2626',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  footer: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    paddingBottom: 32,
+    borderTopWidth: 1,
+    borderTopColor: '#F3F4F6',
   },
   reloadBtn: {
-    marginTop: 10,
-    backgroundColor: '#2563eb',
-    padding: 16,
-    borderRadius: 6,
+    backgroundColor: '#1F2937',
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
   },
-  closeBtn: {
-    marginTop: 10,
-    backgroundColor: '#888',
-    padding: 16,
-    borderRadius: 6,
-    alignItems: 'center',
+  reloadBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
   editOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 24,
   },
   editPanel: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    width: '80%',
-    elevation: 10,
-    maxHeight: 500,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    width: '100%',
+    maxWidth: 400,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 20,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    elevation: 20,
   },
-  editTitle: { fontWeight: 'bold', fontSize: 16, marginBottom: 8 },
+  editHeader: {
+    marginBottom: 20,
+  },
+  editTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  editSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontWeight: '500',
+  },
+  inputContainer: {
+    marginBottom: 24,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+  },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 6,
-    padding: 8,
-    minHeight: 60,
-    marginBottom: 12,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    padding: 16,
+    minHeight: 100,
     fontSize: 14,
+    color: '#111827',
+    backgroundColor: '#F9FAFB',
+    textAlignVertical: 'top',
   },
-  saveBtn: {
-    backgroundColor: '#22c55e',
-    padding: 8,
-    borderRadius: 6,
-    alignItems: 'center',
-    flex: 1,
-    marginRight: 8,
-    marginTop: 12,
+  editActions: {
+    flexDirection: 'row',
+    gap: 12,
   },
   cancelBtn: {
-    backgroundColor: '#888',
-    padding: 8,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginTop: 12,
     flex: 1,
+    backgroundColor: '#F3F4F6',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  deleteBtn: {
-    backgroundColor: '#ef4444',
-    padding: 4,
-    borderRadius: 4,
-    marginLeft: 8,
+  cancelBtnText: {
+    color: '#374151',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  saveBtn: {
+    flex: 1,
+    backgroundColor: '#059669',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  saveBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
