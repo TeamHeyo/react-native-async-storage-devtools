@@ -24,14 +24,14 @@ yarn add react-native-async-storage-devtools
 
 ```
 // _layout.tsx or App.tsx
-import { Slot } from 'expo-router'; // if using Expo Router
-import AsyncStorageDevTool from 'react-native-async-storage-devtools';
+import { Slot } from 'expo-router';
+import AsyncStorageDevTools from 'react-native-async-storage-devtools';
 
 export default function RootLayout() {
   return (
     <>
       <Slot />
-      <AsyncStorageDevTool />
+      <AsyncStorageDevTools />
     </>
   );
 }
