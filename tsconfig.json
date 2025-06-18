@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@react-native-async-storage/async-storage": [
+        "types/react-native-async-storage"
+      ]
+    },
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "target": "ES6",
+    "jsx": "react-jsx",
+    "esModuleInterop": true,
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist"
+  },
+  "include": ["index.tsx", "types"]
+}
