@@ -9,6 +9,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Animated,
 } from 'react-native';
 
 const AsyncStorageDevTools: React.FC = () => {
@@ -16,6 +17,8 @@ const AsyncStorageDevTools: React.FC = () => {
   const [storage, setStorage] = useState<{ key: string; value: string }[]>([]);
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
+  const [overlayOpacity] = useState(new Animated.Value(0));
+  const [panelTranslateY] = useState(new Animated.Value(400));
 
   const loadStorage = async () => {
     try {
@@ -35,6 +38,36 @@ const AsyncStorageDevTools: React.FC = () => {
   useEffect(() => {
     if (visible) {
       loadStorage();
+      // Reset animated values first
+      overlayOpacity.setValue(0);
+      panelTranslateY.setValue(400);
+      // Animate overlay fade in and panel slide up
+      Animated.parallel([
+        Animated.timing(overlayOpacity, {
+          toValue: 1,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(panelTranslateY, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      // Animate overlay fade out and panel slide down
+      Animated.parallel([
+        Animated.timing(overlayOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(panelTranslateY, {
+          toValue: 400,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   }, [visible]);
 
@@ -70,9 +103,16 @@ const AsyncStorageDevTools: React.FC = () => {
       >
         <Text style={styles.fabText}>🔧</Text>
       </TouchableOpacity>
-      <Modal visible={visible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.panel}>
+      <Modal visible={visible} transparent animationType="none">
+        <Animated.View
+          style={[styles.modalOverlay, { opacity: overlayOpacity }]}
+        >
+          <Animated.View
+            style={[
+              styles.panel,
+              { transform: [{ translateY: panelTranslateY }] },
+            ]}
+          >
             <View style={styles.header}>
               <View style={styles.titleContainer}>
                 <Text style={styles.title}>AsyncStorage DevTools</Text>
@@ -144,7 +184,7 @@ const AsyncStorageDevTools: React.FC = () => {
                 <Text style={styles.reloadBtnText}>🔄 Refresh</Text>
               </TouchableOpacity>
             </View>
-          </View>
+          </Animated.View>
 
           <Modal visible={editingKey !== null} transparent animationType="fade">
             <View style={styles.editOverlay}>
@@ -180,7 +220,7 @@ const AsyncStorageDevTools: React.FC = () => {
               </View>
             </View>
           </Modal>
-        </View>
+        </Animated.View>
       </Modal>
     </>
   );
