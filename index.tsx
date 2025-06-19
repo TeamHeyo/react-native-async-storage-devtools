@@ -140,95 +140,109 @@ const AsyncStorageDevTools: React.FC = () => {
         <Animated.View
           style={[styles.modalOverlay, { opacity: overlayOpacity }]}
         >
-          <Animated.View
-            style={[
-              styles.panel,
-              { transform: [{ translateY: panelTranslateY }] },
-            ]}
+          <TouchableOpacity
+            style={styles.overlayTouchable}
+            activeOpacity={1}
+            onPress={() => setVisible(false)}
           >
-            <View style={styles.header}>
-              <View style={styles.titleContainer}>
-                <Text style={styles.title}>AsyncStorage DevTools</Text>
-                <Text style={styles.subtitle}>Development Tools</Text>
-              </View>
+            <Animated.View
+              style={[
+                styles.panel,
+                { transform: [{ translateY: panelTranslateY }] },
+              ]}
+            >
               <TouchableOpacity
-                onPress={() => setVisible(false)}
-                style={styles.closeIcon}
+                style={styles.panelContent}
+                activeOpacity={1}
+                onPress={(e) => e.stopPropagation()}
               >
-                <Text style={styles.closeIconText}>✕</Text>
-              </TouchableOpacity>
-            </View>
+                <View style={styles.header}>
+                  <View style={styles.titleContainer}>
+                    <Text style={styles.title}>AsyncStorage DevTools</Text>
+                    <Text style={styles.subtitle}>Development Tools</Text>
+                  </View>
+                  <TouchableOpacity
+                    onPress={() => setVisible(false)}
+                    style={styles.closeIcon}
+                  >
+                    <Text style={styles.closeIconText}>✕</Text>
+                  </TouchableOpacity>
+                </View>
 
-            <View style={styles.content}>
-              <View style={styles.statsContainer}>
-                <Text style={styles.statsText}>
-                  {storage.length} {storage.length === 1 ? 'item' : 'items'}
-                </Text>
-              </View>
-
-              <ScrollView
-                style={styles.scrollView}
-                showsVerticalScrollIndicator={false}
-              >
-                {storage.length === 0 ? (
-                  <View style={styles.emptyState}>
-                    <Text style={styles.emptyStateText}>
-                      No data in AsyncStorage
-                    </Text>
-                    <Text style={styles.emptyStateSubtext}>
-                      Add some data to see it here
+                <View style={styles.content}>
+                  <View style={styles.statsContainer}>
+                    <Text style={styles.statsText}>
+                      {storage.length} {storage.length === 1 ? 'item' : 'items'}
                     </Text>
                   </View>
-                ) : (
-                  storage.map(
-                    ({ key, value }: { key: string; value: string }) => (
-                      <View key={key} style={styles.item}>
-                        <View style={styles.itemHeaderRow}>
-                          <Text style={styles.key} numberOfLines={1}>
-                            {key}
-                          </Text>
-                          <View style={styles.itemActions}>
-                            <TouchableOpacity
-                              onPress={() => handleEdit(key, value)}
-                              style={styles.editBtn}
-                            >
-                              <Text style={styles.editBtnText}>Edit</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                              onPress={() => handleDelete(key)}
-                              style={styles.deleteBtn}
-                            >
-                              <Text style={styles.deleteBtnText}>Delete</Text>
-                            </TouchableOpacity>
-                          </View>
-                        </View>
-                        <Text style={styles.value} numberOfLines={2}>
-                          {value}
+
+                  <ScrollView
+                    style={styles.scrollView}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {storage.length === 0 ? (
+                      <View style={styles.emptyState}>
+                        <Text style={styles.emptyStateText}>
+                          No data in AsyncStorage
+                        </Text>
+                        <Text style={styles.emptyStateSubtext}>
+                          Add some data to see it here
                         </Text>
                       </View>
-                    )
-                  )
-                )}
-              </ScrollView>
-            </View>
+                    ) : (
+                      storage.map(
+                        ({ key, value }: { key: string; value: string }) => (
+                          <View key={key} style={styles.item}>
+                            <View style={styles.itemHeaderRow}>
+                              <Text style={styles.key} numberOfLines={1}>
+                                {key}
+                              </Text>
+                              <View style={styles.itemActions}>
+                                <TouchableOpacity
+                                  onPress={() => handleEdit(key, value)}
+                                  style={styles.editBtn}
+                                >
+                                  <Text style={styles.editBtnText}>Edit</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() => handleDelete(key)}
+                                  style={styles.deleteBtn}
+                                >
+                                  <Text style={styles.deleteBtnText}>
+                                    Delete
+                                  </Text>
+                                </TouchableOpacity>
+                              </View>
+                            </View>
+                            <Text style={styles.value} numberOfLines={2}>
+                              {value}
+                            </Text>
+                          </View>
+                        )
+                      )
+                    )}
+                  </ScrollView>
+                </View>
 
-            <View style={styles.footer}>
-              <View style={styles.footerButtons}>
-                <TouchableOpacity
-                  onPress={handleCreateNew}
-                  style={styles.createBtn}
-                >
-                  <Text style={styles.createBtnText}>Create New</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={loadStorage}
-                  style={styles.reloadBtn}
-                >
-                  <Text style={styles.reloadBtnText}>Refresh</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Animated.View>
+                <View style={styles.footer}>
+                  <View style={styles.footerButtons}>
+                    <TouchableOpacity
+                      onPress={handleCreateNew}
+                      style={styles.createBtn}
+                    >
+                      <Text style={styles.createBtnText}>Create New</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={loadStorage}
+                      style={styles.reloadBtn}
+                    >
+                      <Text style={styles.reloadBtnText}>Refresh</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </Animated.View>
+          </TouchableOpacity>
 
           <Modal visible={editingKey !== null} transparent animationType="fade">
             <View style={styles.editOverlay}>
@@ -629,6 +643,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  overlayTouchable: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  panelContent: {
+    flex: 1,
   },
 });
 
