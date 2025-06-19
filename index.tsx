@@ -140,22 +140,14 @@ const AsyncStorageDevTools: React.FC = () => {
         <Animated.View
           style={[styles.modalOverlay, { opacity: overlayOpacity }]}
         >
-          <TouchableOpacity
-            style={styles.overlayTouchable}
-            activeOpacity={1}
-            onPress={() => setVisible(false)}
-          >
+          <View style={styles.overlayTouchable}>
             <Animated.View
               style={[
                 styles.panel,
                 { transform: [{ translateY: panelTranslateY }] },
               ]}
             >
-              <TouchableOpacity
-                style={styles.panelContent}
-                activeOpacity={1}
-                onPress={(e) => e.stopPropagation()}
-              >
+              <View style={styles.panelContent}>
                 <View style={styles.header}>
                   <View style={styles.titleContainer}>
                     <Text style={styles.title}>AsyncStorage DevTools</Text>
@@ -240,9 +232,9 @@ const AsyncStorageDevTools: React.FC = () => {
                     </TouchableOpacity>
                   </View>
                 </View>
-              </TouchableOpacity>
+              </View>
             </Animated.View>
-          </TouchableOpacity>
+          </View>
 
           <Modal visible={editingKey !== null} transparent animationType="fade">
             <View style={styles.editOverlay}>
@@ -252,17 +244,22 @@ const AsyncStorageDevTools: React.FC = () => {
                   <Text style={styles.editSubtitle}>{editingKey}</Text>
                 </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Value</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={editingValue}
-                    onChangeText={setEditingValue}
-                    multiline
-                    placeholder="Enter value..."
-                    placeholderTextColor="#9CA3AF"
-                  />
-                </View>
+                <Text style={styles.inputLabel}>Value</Text>
+                <ScrollView
+                  style={styles.editScrollView}
+                  showsVerticalScrollIndicator={false}
+                >
+                  <View style={styles.inputContainer}>
+                    <TextInput
+                      style={styles.input}
+                      value={editingValue}
+                      onChangeText={setEditingValue}
+                      multiline
+                      placeholder="Enter value..."
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </ScrollView>
 
                 <View style={styles.editActions}>
                   <TouchableOpacity
@@ -289,30 +286,35 @@ const AsyncStorageDevTools: React.FC = () => {
                   </Text>
                 </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Key</Text>
-                  <TextInput
-                    style={styles.keyInput}
-                    value={newKey}
-                    onChangeText={setNewKey}
-                    placeholder="Enter key..."
-                    placeholderTextColor="#9CA3AF"
-                    multiline={false}
-                    autoCapitalize="none"
-                  />
-                </View>
+                <ScrollView
+                  style={styles.editScrollView}
+                  showsVerticalScrollIndicator={false}
+                >
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Key</Text>
+                    <TextInput
+                      style={styles.keyInput}
+                      value={newKey}
+                      onChangeText={setNewKey}
+                      placeholder="Enter key..."
+                      placeholderTextColor="#9CA3AF"
+                      multiline={false}
+                      autoCapitalize="none"
+                    />
+                  </View>
 
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Value</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={newValue}
-                    onChangeText={setNewValue}
-                    multiline
-                    placeholder="Enter value..."
-                    placeholderTextColor="#9CA3AF"
-                  />
-                </View>
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.inputLabel}>Value</Text>
+                    <TextInput
+                      style={styles.input}
+                      value={newValue}
+                      onChangeText={setNewValue}
+                      multiline
+                      placeholder="Enter value..."
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                </ScrollView>
 
                 <View style={styles.editActions}>
                   <TouchableOpacity
@@ -567,6 +569,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 24,
     elevation: 20,
+    maxHeight: '50%',
+    flex: 1,
   },
   editHeader: {
     marginBottom: 20,
@@ -581,6 +585,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     fontWeight: '500',
+  },
+  editScrollView: {
+    flex: 1,
   },
   inputContainer: {
     marginBottom: 24,
@@ -625,6 +632,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     borderWidth: 1,
+    marginTop: 14,
     borderColor: '#E5E7EB',
   },
   cancelBtnText: {
@@ -637,6 +645,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#059669',
     paddingVertical: 14,
     borderRadius: 12,
+    marginTop: 14,
     alignItems: 'center',
   },
   saveBtnText: {
