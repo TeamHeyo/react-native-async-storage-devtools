@@ -17,6 +17,9 @@ const AsyncStorageDevTools: React.FC = () => {
   const [storage, setStorage] = useState<{ key: string; value: string }[]>([]);
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editingValue, setEditingValue] = useState<string>('');
+  const [creatingNew, setCreatingNew] = useState(false);
+  const [newKey, setNewKey] = useState<string>('');
+  const [newValue, setNewValue] = useState<string>('');
   const [overlayOpacity] = useState(new Animated.Value(0));
   const [panelTranslateY] = useState(new Animated.Value(400));
 
@@ -85,9 +88,39 @@ const AsyncStorageDevTools: React.FC = () => {
     }
   };
 
+  const handleCreateNew = () => {
+    setCreatingNew(true);
+    setNewKey('');
+    setNewValue('');
+  };
+
+  const handleSaveNew = async () => {
+    if (newKey.trim() && newValue.trim()) {
+      await AsyncStorage.setItem(newKey.trim(), newValue.trim());
+      setCreatingNew(false);
+      setNewKey('');
+      setNewValue('');
+      loadStorage();
+    } else {
+      Alert.alert('Error', 'Please enter both key and value');
+    }
+  };
+
   const handleDelete = async (key: string) => {
-    await AsyncStorage.removeItem(key);
-    loadStorage();
+    Alert.alert('Delete Item', `Are you sure you want to delete "${key}"?`, [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.removeItem(key);
+          loadStorage();
+        },
+      },
+    ]);
   };
 
   if (!__DEV__) {
@@ -101,7 +134,7 @@ const AsyncStorageDevTools: React.FC = () => {
         onPress={() => setVisible(true)}
         activeOpacity={0.8}
       >
-        <Text style={styles.fabText}>🔧</Text>
+        <Text style={styles.fabText}>⚡️</Text>
       </TouchableOpacity>
       <Modal visible={visible} transparent animationType="none">
         <Animated.View
@@ -150,28 +183,28 @@ const AsyncStorageDevTools: React.FC = () => {
                   storage.map(
                     ({ key, value }: { key: string; value: string }) => (
                       <View key={key} style={styles.item}>
-                        <View style={styles.itemContent}>
+                        <View style={styles.itemHeaderRow}>
                           <Text style={styles.key} numberOfLines={1}>
                             {key}
                           </Text>
-                          <Text style={styles.value} numberOfLines={2}>
-                            {value}
-                          </Text>
+                          <View style={styles.itemActions}>
+                            <TouchableOpacity
+                              onPress={() => handleEdit(key, value)}
+                              style={styles.editBtn}
+                            >
+                              <Text style={styles.editBtnText}>Edit</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                              onPress={() => handleDelete(key)}
+                              style={styles.deleteBtn}
+                            >
+                              <Text style={styles.deleteBtnText}>Delete</Text>
+                            </TouchableOpacity>
+                          </View>
                         </View>
-                        <View style={styles.itemActions}>
-                          <TouchableOpacity
-                            onPress={() => handleEdit(key, value)}
-                            style={styles.editBtn}
-                          >
-                            <Text style={styles.editBtnText}>Edit</Text>
-                          </TouchableOpacity>
-                          <TouchableOpacity
-                            onPress={() => handleDelete(key)}
-                            style={styles.deleteBtn}
-                          >
-                            <Text style={styles.deleteBtnText}>Delete</Text>
-                          </TouchableOpacity>
-                        </View>
+                        <Text style={styles.value} numberOfLines={2}>
+                          {value}
+                        </Text>
                       </View>
                     )
                   )
@@ -180,9 +213,20 @@ const AsyncStorageDevTools: React.FC = () => {
             </View>
 
             <View style={styles.footer}>
-              <TouchableOpacity onPress={loadStorage} style={styles.reloadBtn}>
-                <Text style={styles.reloadBtnText}>🔄 Refresh</Text>
-              </TouchableOpacity>
+              <View style={styles.footerButtons}>
+                <TouchableOpacity
+                  onPress={handleCreateNew}
+                  style={styles.createBtn}
+                >
+                  <Text style={styles.createBtnText}>Create New</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={loadStorage}
+                  style={styles.reloadBtn}
+                >
+                  <Text style={styles.reloadBtnText}>Refresh</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </Animated.View>
 
@@ -220,6 +264,59 @@ const AsyncStorageDevTools: React.FC = () => {
               </View>
             </View>
           </Modal>
+
+          <Modal visible={creatingNew} transparent animationType="fade">
+            <View style={styles.editOverlay}>
+              <View style={styles.editPanel}>
+                <View style={styles.editHeader}>
+                  <Text style={styles.editTitle}>Create New Storage Item</Text>
+                  <Text style={styles.editSubtitle}>
+                    Add a new key-value pair
+                  </Text>
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Key</Text>
+                  <TextInput
+                    style={styles.keyInput}
+                    value={newKey}
+                    onChangeText={setNewKey}
+                    placeholder="Enter key..."
+                    placeholderTextColor="#9CA3AF"
+                    multiline={false}
+                    autoCapitalize="none"
+                  />
+                </View>
+
+                <View style={styles.inputContainer}>
+                  <Text style={styles.inputLabel}>Value</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={newValue}
+                    onChangeText={setNewValue}
+                    multiline
+                    placeholder="Enter value..."
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+
+                <View style={styles.editActions}>
+                  <TouchableOpacity
+                    onPress={() => setCreatingNew(false)}
+                    style={styles.cancelBtn}
+                  >
+                    <Text style={styles.cancelBtnText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={handleSaveNew}
+                    style={styles.saveBtn}
+                  >
+                    <Text style={styles.saveBtnText}>Create Item</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
         </Animated.View>
       </Modal>
     </>
@@ -229,8 +326,8 @@ const AsyncStorageDevTools: React.FC = () => {
 const styles = StyleSheet.create({
   fab: {
     position: 'absolute',
-    bottom: 120,
-    right: 24,
+    bottom: 100,
+    right: 10,
     backgroundColor: '#1F2937',
     borderRadius: 28,
     width: 56,
@@ -345,55 +442,60 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: '#F9FAFB',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#F3F4F6',
   },
-  itemContent: {
-    marginBottom: 12,
+  itemHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+    gap: 8,
   },
   key: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
     color: '#111827',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   value: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#6B7280',
-    lineHeight: 18,
+    lineHeight: 16,
   },
   itemActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 4,
+    marginTop: 2,
   },
   editBtn: {
     backgroundColor: '#DBEAFE',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: '#BFDBFE',
   },
   editBtnText: {
     color: '#1D4ED8',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   deleteBtn: {
     backgroundColor: '#FEE2E2',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
     borderWidth: 1,
     borderColor: '#FECACA',
   },
   deleteBtnText: {
     color: '#DC2626',
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   footer: {
     paddingHorizontal: 24,
@@ -402,7 +504,24 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
   },
+  footerButtons: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  createBtn: {
+    flex: 1,
+    backgroundColor: '#059669',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  createBtnText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   reloadBtn: {
+    flex: 1,
     backgroundColor: '#1F2937',
     paddingVertical: 14,
     borderRadius: 12,
@@ -468,6 +587,18 @@ const styles = StyleSheet.create({
     color: '#111827',
     backgroundColor: '#F9FAFB',
     textAlignVertical: 'top',
+  },
+  keyInput: {
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#111827',
+    backgroundColor: '#F9FAFB',
+    minHeight: 0,
+    height: 44,
   },
   editActions: {
     flexDirection: 'row',
