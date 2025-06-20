@@ -1,6 +1,6 @@
 {
   "name": "react-native-async-storage-devtools",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A devtool for React Native AsyncStorage",
   "author": "Heyo",
   "license": "MIT",
